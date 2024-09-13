@@ -8,4 +8,5 @@ public interface IUserService {
     void registerUser(UserRegistrationRequest userRequest);
     void confirmIdentity(UserRegistrationRequest userRequest);
     AuthenticationResultType loginUser(UserLoginRequest userRequest);
+    String revokeToken(String refreshToken);
 }

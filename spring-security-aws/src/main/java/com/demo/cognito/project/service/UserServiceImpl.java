@@ -2,7 +2,6 @@ package com.demo.cognito.project.service;
 
 import com.demo.cognito.project.model.UserLoginRequest;
 import com.demo.cognito.project.model.UserRegistrationRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -67,12 +66,26 @@ public class UserServiceImpl implements IUserService{
                     )
                     .build();
             InitiateAuthResponse initiateAuthResponse = cognitoClient.initiateAuth(initiateAuthRequest);
-            AuthenticationResultType authenticationResult = initiateAuthResponse.authenticationResult();
 
-            return authenticationResult;
+            return initiateAuthResponse.authenticationResult();
         } catch (Exception e) {
             // Handle login errors
             throw new RuntimeException("Error login user : " + e.getMessage(), e);
+        }
+    }
+
+    public String revokeToken(String refreshToken) {
+        try {
+            RevokeTokenRequest revokeTokenRequest = RevokeTokenRequest.builder()
+                    .clientId(cognitoClientId)
+                    .token(refreshToken)
+                    .build();
+
+            cognitoClient.revokeToken(revokeTokenRequest);
+
+            return "Token revoked successfully";
+        } catch (CognitoIdentityProviderException e) {
+            throw new RuntimeException("Failed to revoke token: " + e.awsErrorDetails().errorMessage());
         }
     }
 }

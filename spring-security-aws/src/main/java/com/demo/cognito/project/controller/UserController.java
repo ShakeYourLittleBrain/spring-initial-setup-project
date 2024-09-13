@@ -1,9 +1,9 @@
 package com.demo.cognito.project.controller;
 
+import com.demo.cognito.project.model.RevokeToken;
 import com.demo.cognito.project.model.UserLoginRequest;
 import com.demo.cognito.project.model.UserRegistrationRequest;
 import com.demo.cognito.project.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +47,16 @@ public class UserController {
             return ResponseEntity.ok(authentication);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody RevokeToken tokenRequest) {
+        try {
+            String response = userService.revokeToken(tokenRequest.getRefreshToken());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error logout: " + e.getMessage());
         }
     }
 }
