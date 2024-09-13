@@ -2,9 +2,11 @@
 aws:
   cognito:
     region: us-east-1
-    userPoolId: us-east-1_examplepoolid
-    cognitoClientId : <here is the client id>
-    jwkSetUri: https://cognito-idp.${aws.cognito.region}.amazonaws.com/${aws.cognito.userPoolId}/.well-known/jwks.json
+    userPoolId:
+    cognitoClientId :
+    jwkSetUri: https://cognito-idp.${aws.cognito.region}.amazonaws.com/${aws.cognito.userPoolId}
+    accessKey:
+    secretKey:
 
 spring:
   application:
