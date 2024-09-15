@@ -10,10 +10,10 @@ import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityPr
 @Configuration
 public class CognitoConfig {
 
-    @Value(value = "aws.cognito.accessKey")
+    @Value(value = "${aws.cognito.accessKey}")
     private String cognitoAccessKey;
 
-    @Value(value = "aws.cognito.secretKey")
+    @Value(value = "${aws.cognito.secretKey}")
     private String cognitoSecretKey;
 
     @Bean

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class UserRegistrationRequest {
 
-    private String userName;
+    private String username;
     private String password;
     private String email;
 }

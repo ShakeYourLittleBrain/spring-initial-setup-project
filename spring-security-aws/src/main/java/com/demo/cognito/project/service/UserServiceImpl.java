@@ -14,8 +14,11 @@ public class UserServiceImpl implements IUserService{
 
     private final CognitoIdentityProviderClient cognitoClient;
 
-    @Value(value = "aws.cognito.clientId")
+    @Value(value = "${aws.cognito.cognitoClientId}")
     private String cognitoClientId;
+
+    @Value(value = "${aws.cognito.userPoolId}")
+    private String cognitoUserPoolId;
 
     public UserServiceImpl(CognitoIdentityProviderClient cognitoClient) {
         this.cognitoClient = cognitoClient;
@@ -25,7 +28,7 @@ public class UserServiceImpl implements IUserService{
         try {
             SignUpRequest signUpRequest = SignUpRequest.builder()
                     .clientId(cognitoClientId)
-                    .username(userRequest.getUserName())
+                    .username(userRequest.getUsername())
                     .password(userRequest.getPassword())
                     .userAttributes(AttributeType.builder()
                             .name("email").value(userRequest.getEmail()).build()
@@ -42,8 +45,8 @@ public class UserServiceImpl implements IUserService{
     public void confirmIdentity(UserRegistrationRequest userRequest) {
         try {
             AdminConfirmSignUpRequest adminConfirmSignUpRequest = AdminConfirmSignUpRequest.builder()
-                    .userPoolId(cognitoClientId)
-                    .username(userRequest.getUserName())
+                    .userPoolId(cognitoUserPoolId)
+                    .username(userRequest.getUsername())
                     .build();
             cognitoClient.adminConfirmSignUp(adminConfirmSignUpRequest);
 

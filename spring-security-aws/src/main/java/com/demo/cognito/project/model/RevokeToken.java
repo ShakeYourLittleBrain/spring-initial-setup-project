@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @ToString
-public class User {
-    private String accessToken;
+public class RevokeToken {
     private String refreshToken;
-    private String idToken;
 }

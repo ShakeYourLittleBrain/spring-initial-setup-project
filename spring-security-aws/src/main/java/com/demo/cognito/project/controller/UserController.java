@@ -1,6 +1,7 @@
 package com.demo.cognito.project.controller;
 
 import com.demo.cognito.project.model.RevokeToken;
+import com.demo.cognito.project.model.User;
 import com.demo.cognito.project.model.UserLoginRequest;
 import com.demo.cognito.project.model.UserRegistrationRequest;
 import com.demo.cognito.project.service.IUserService;
@@ -41,10 +42,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResultType> loginUser(@RequestBody UserLoginRequest userRequest) {
+    public ResponseEntity<User> loginUser(@RequestBody UserLoginRequest userRequest) {
         AuthenticationResultType authentication = userService.loginUser(userRequest);
         if (authentication != null) { // Login user with Cognito
-            return ResponseEntity.ok(authentication);
+            return ResponseEntity.ok(User.builder()
+                            .accessToken(authentication.accessToken())
+                            .refreshToken(authentication.refreshToken())
+                            .idToken(authentication.idToken())
+                    .build());
         } else {
             return ResponseEntity.badRequest().body(null);
         }

@@ -10,6 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -17,7 +18,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value(value = "aws.cognito.jwkSetUri")
+    @Value(value = "${aws.cognito.jwkSetUri}")
     private String jwkSetUri;
 
 
@@ -38,7 +39,8 @@ public class SecurityConfig {
                                 .decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                );
+                ).exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+                        new Http403ForbiddenEntryPoint());
 
         return http.build();
     }
