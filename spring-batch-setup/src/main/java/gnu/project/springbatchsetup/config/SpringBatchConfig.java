@@ -8,9 +8,10 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import java.io.File;
 
@@ -32,18 +34,14 @@ import java.io.File;
 //@AllArgsConstructor
 public class SpringBatchConfig {
 
-    private final JobBuilderFactory jobBuilderFactory;
-    private final StepBuilderFactory stepBuilderFactory;
+
     private final CustomerRepository customerRepository;
     private final CustomerItemWriter customerItemWriter;
 
-    public SpringBatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, CustomerRepository customerRepository, CustomerItemWriter customerItemWriter) {
-        this.jobBuilderFactory = jobBuilderFactory;
-        this.stepBuilderFactory = stepBuilderFactory;
+    public SpringBatchConfig( CustomerRepository customerRepository, CustomerItemWriter customerItemWriter) {
         this.customerRepository = customerRepository;
         this.customerItemWriter = customerItemWriter;
     }
-
 
     @Bean
     @StepScope
@@ -88,8 +86,9 @@ public class SpringBatchConfig {
 
 
     @Bean
-    public Step step1(FlatFileItemReader<Customer> itemReader) {
-        return stepBuilderFactory.get("slaveStep").<Customer, Customer>chunk(10)
+    public Step step1(JobRepository jobRepository,
+                      DataSourceTransactionManager transactionManager, FlatFileItemReader<Customer> itemReader) {
+        return new StepBuilder("jobStep", jobRepository).<Customer, Customer>chunk(10, transactionManager)
                 .reader(itemReader)
                 .processor(processor())
                 .writer(customerItemWriter)
@@ -102,8 +101,9 @@ public class SpringBatchConfig {
 
 
     @Bean
-    public Job runJob(FlatFileItemReader<Customer> itemReader) {
-        return jobBuilderFactory.get("importCustomer").flow(step1(itemReader)).end().build();
+    public Job runJob(JobRepository jobRepository,
+                      Step step1) {
+        return new JobBuilder("job", jobRepository).start(step1).build();
     }
 
 
